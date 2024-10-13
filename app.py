@@ -39,7 +39,7 @@ init_db()
 def get_webapp():
     #return jsonify({'message': 'Hello, World!'})
     return ('''
-        <DOCTYPE! html>
+        <!DOCTYPE html>
         <html lang='en'>
             <head></head>
             <body>
@@ -102,6 +102,22 @@ def delete_product(product_id):
     db.execute('DELETE FROM products WHERE id = ?', (product_id,))
     db.commit()
     return jsonify({'message': 'Product with id {} deleted successfully'.format(product_id)}), 200
+
+# GET: a single product info
+@app.route('/products/<int:product_id>', methods=['GET'])
+def get_product(product_id):
+    db = get_db()
+    
+    # Fetch a single product based on its ID
+    cursor = db.execute('SELECT * FROM products WHERE id = ?', (product_id,))
+    product = cursor.fetchone()  # Use fetchone() instead of fetchall()
+
+    # Check if product exists
+    if product is None:
+        return jsonify({'error': 'Product not found'}), 404
+
+    # Convert the row to a dictionary
+    return jsonify(dict(product))
 
 
 if __name__ == '__main__':
